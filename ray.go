@@ -31,12 +31,12 @@ func (r Ray) Color() color.RGBA {
 
 func (r Ray) hitSphere(center Vec3, radius float64) float64 {
 	oc := r.origin.Sub(center)
-	a := r.direction.Dot(r.direction)
-	b := 2.0 * oc.Dot(r.direction)
-	c := oc.Dot(oc) - radius*radius
-	discriminant := b*b - 4*a*c
+	a := r.direction.LengthSquared()
+	halfB := oc.Dot(r.direction)
+	c := oc.LengthSquared() - radius*radius
+	discriminant := halfB*halfB - a*c
 	if discriminant < 0 {
 		return -1.0
 	}
-	return (-b - math.Sqrt(discriminant)) / (2.0 * a)
+	return (-halfB - math.Sqrt(discriminant)) / a
 }

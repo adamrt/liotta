@@ -50,8 +50,11 @@ func main() {
 	}
 
 	fmt.Printf("\nDone.\n")
+	writePNG(img, "output.png")
+}
 
-	f, err := os.Create("output.png")
+func writePNG(img *image.RGBA, filename string) {
+	f, err := os.Create(filename)
 	if err != nil {
 		log.Fatal(err)
 	}
