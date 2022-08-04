@@ -22,7 +22,7 @@ func (r Ray) Color(world Hittable, depth int) Vec3 {
 		return Vec3{0, 0, 0}
 	}
 
-	hit, record := world.Hit(r, 0.0, Infinity)
+	hit, record := world.Hit(r, 0.001, Infinity)
 	if hit {
 		target := record.point.Add(record.normal).Add(Vec3RandomInUnitSphere())
 		ray := Ray{record.point, target.Sub(record.point)}
