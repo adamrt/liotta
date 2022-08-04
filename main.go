@@ -22,14 +22,15 @@ func main() {
 	img := image.NewRGBA(image.Rect(0, 0, ImageWidth, ImageHeight))
 
 	materialGround := NewLambert(Vec3{0.8, 0.8, 0.0})
-	materialCenter := NewLambert(Vec3{0.7, 0.3, 0.3})
-	materialLeft := NewMetal(Vec3{0.8, 0.8, 0.8}, 0.3)
-	materialRight := NewMetal(Vec3{0.8, 0.6, 0.2}, 1.0)
+	materialCenter := NewLambert(Vec3{0.1, 0.2, 0.5})
+	materialLeft := NewDielectric(1.5)
+	materialRight := NewMetal(Vec3{0.8, 0.6, 0.2}, 0.0)
 
 	world := World{
 		NewSphere(Vec3{0.0, -100.5, -1.0}, 100.0, materialGround),
 		NewSphere(Vec3{0.0, 0.0, -1.0}, 0.5, materialCenter),
 		NewSphere(Vec3{-1.0, 0.0, -1.0}, 0.5, materialLeft),
+		NewSphere(Vec3{-1.0, 0.0, -1.0}, -0.4, materialLeft),
 		NewSphere(Vec3{1.0, 0.0, -1.0}, 0.5, materialRight),
 	}
 

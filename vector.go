@@ -127,6 +127,13 @@ func (v Vec3) Reflect(u Vec3) Vec3 {
 	return v.Sub(u.ScalarMul(2 * v.Dot(u)))
 }
 
+func (v Vec3) Refract(u Vec3, etaiOverEtat float64) Vec3 {
+	cosTheta := math.Min(v.Neg().Dot(u), 1.0)
+	rOutPerp := u.ScalarMul(cosTheta).Add(v).ScalarMul(etaiOverEtat)
+	rOutParallel := u.ScalarMul(-math.Sqrt(math.Abs(1.0 - rOutPerp.LengthSquared())))
+	return rOutPerp.Add(rOutParallel)
+}
+
 func (v Vec3) RGBA(samplesPerPixel int) color.RGBA {
 
 	r := v.x
