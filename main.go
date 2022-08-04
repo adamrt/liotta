@@ -21,16 +21,16 @@ const (
 func main() {
 	img := image.NewRGBA(image.Rect(0, 0, ImageWidth, ImageHeight))
 
-	material_ground := Lambert{Vec3{0.8, 0.8, 0.0}}
-	material_center := Lambert{Vec3{0.7, 0.3, 0.3}}
-	material_left := Metal{Vec3{0.8, 0.8, 0.8}}
-	material_right := Metal{Vec3{0.8, 0.6, 0.2}}
+	materialGround := NewLambert(Vec3{0.8, 0.8, 0.0})
+	materialCenter := NewLambert(Vec3{0.7, 0.3, 0.3})
+	materialLeft := NewMetal(Vec3{0.8, 0.8, 0.8}, 0.3)
+	materialRight := NewMetal(Vec3{0.8, 0.6, 0.2}, 1.0)
 
 	world := World{
-		NewSphere(Vec3{0.0, -100.5, -1.0}, 100.0, material_ground),
-		NewSphere(Vec3{0.0, 0.0, -1.0}, 0.5, material_center),
-		NewSphere(Vec3{-1.0, 0.0, -1.0}, 0.5, material_left),
-		NewSphere(Vec3{1.0, 0.0, -1.0}, 0.5, material_right),
+		NewSphere(Vec3{0.0, -100.5, -1.0}, 100.0, materialGround),
+		NewSphere(Vec3{0.0, 0.0, -1.0}, 0.5, materialCenter),
+		NewSphere(Vec3{-1.0, 0.0, -1.0}, 0.5, materialLeft),
+		NewSphere(Vec3{1.0, 0.0, -1.0}, 0.5, materialRight),
 	}
 
 	camera := NewCamera()

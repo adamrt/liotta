@@ -4,6 +4,10 @@ type Material interface {
 	Scatter(ray Ray, record *HitRecord, attenuation *Vec3, scattered *Ray) bool
 }
 
+func NewLambert(albedo Vec3) Lambert {
+	return Lambert{albedo: albedo}
+}
+
 type Lambert struct {
 	albedo Vec3
 }
@@ -29,13 +33,18 @@ func (l Lambert) Scatter(ray Ray, record *HitRecord, attenuation *Vec3, scattere
 	return true
 }
 
+func NewMetal(albedo Vec3, fuzz float64) Metal {
+	return Metal{albedo: albedo, fuzz: fuzz}
+}
+
 type Metal struct {
 	albedo Vec3
+	fuzz   float64
 }
 
 func (m Metal) Scatter(ray Ray, record *HitRecord, attenuation *Vec3, scattered *Ray) bool {
 	reflected := ray.direction.Unit().Reflect(record.normal)
-	*scattered = Ray{record.point, reflected}
+	*scattered = Ray{record.point, Vec3RandomInUnitSphere().ScalarMul(m.fuzz).Add(reflected)}
 	*attenuation = m.albedo
 	return scattered.direction.Dot(record.normal) > 0
 }
