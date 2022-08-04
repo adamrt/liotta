@@ -111,11 +111,12 @@ func (v Vec3) RGBA(samplesPerPixel int) color.RGBA {
 	g := v.y
 	b := v.z
 
-	// Divide the color by the number of samples.
+	// Divide the color by the number of samples and gamma-correct for
+	// gamma=2.0.
 	scale := 1.0 / float64(samplesPerPixel)
-	r *= scale
-	g *= scale
-	b *= scale
+	r = math.Sqrt(scale * r)
+	g = math.Sqrt(scale * g)
+	b = math.Sqrt(scale * b)
 
 	// Write the translated [0,255] value of each color component.
 	return color.RGBA{
