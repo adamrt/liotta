@@ -5,6 +5,7 @@ import (
 	"image"
 	"image/png"
 	"log"
+	"math"
 	"os"
 )
 
@@ -18,6 +19,12 @@ const (
 	ViewportHeight = 2.0
 	ViewportWidth  = AspectRatio * ViewportHeight
 	FocalLength    = 1.0
+
+	PI = math.Pi
+)
+
+var (
+	Infinity = math.Inf(1)
 )
 
 func main() {
@@ -28,6 +35,11 @@ func main() {
 		vertical        = Vec3{0, ViewportHeight, 0}
 		lowerLeftCorner = origin.Sub(horizontal.ScalarDiv(2)).Sub(vertical.ScalarDiv(2)).Sub(Vec3{0, 0, FocalLength})
 	)
+
+	world := World{
+		Sphere{Vec3{0, 0, -1}, 0.5},
+		Sphere{Vec3{0, -100.5, -1}, 100},
+	}
 
 	img := image.NewRGBA(image.Rect(0, 0, ImageWidth, ImageHeight))
 
@@ -45,12 +57,16 @@ func main() {
 			}
 
 			// j calculation is to invert the image.
-			img.Set(i, (ImageHeight-1)-j, ray.Color())
+			img.Set(i, (ImageHeight-1)-j, ray.Color(world))
 		}
 	}
 
 	fmt.Printf("\nDone.\n")
 	writePNG(img, "output.png")
+}
+
+func DegreesToRadians(degrees float64) float64 {
+	return degrees * PI / 180.0
 }
 
 func writePNG(img *image.RGBA, filename string) {

@@ -49,6 +49,14 @@ func (v Vec3) ScalarMul(s float64) Vec3 {
 	}
 }
 
+func (v Vec3) Neg() Vec3 {
+	return Vec3{
+		x: -v.x,
+		y: -v.y,
+		z: -v.z,
+	}
+}
+
 func (v Vec3) ScalarDiv(s float64) Vec3 {
 	return v.ScalarMul(1.0 / s)
 }

@@ -15,14 +15,13 @@ func (r Ray) At(t float64) Vec3 {
 	return r.origin.Add(v)
 }
 
-func (r Ray) Color() color.RGBA {
-	t := r.hitSphere(Vec3{0, 0, -1}, 0.5)
-	if t > 0.0 {
-		N := r.At(t).Unit().Sub(Vec3{0, 0, -1})
-		return Vec3{N.x + 1, N.y + 1, N.z + 1}.ScalarMul(0.5).RGBA()
+func (r Ray) Color(world Hittable) color.RGBA {
+	hitRecord := HitRecord{}
+	if world.Hit(r, 0.0, Infinity, &hitRecord) {
+		return hitRecord.normal.Add(Vec3{1, 1, 1}).ScalarMul(0.5).RGBA()
 	}
 	unitDirection := r.direction.Unit()
-	t = 0.5 * (unitDirection.y + 1.0)
+	t := 0.5 * (unitDirection.y + 1.0)
 	a := Vec3{1.0, 1.0, 1.0}.ScalarMul(1.0 - t)
 	b := Vec3{0.5, 0.7, 1.0}.ScalarMul(t)
 	return a.Add(b).RGBA()
