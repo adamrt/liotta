@@ -3,10 +3,6 @@ package main
 import (
 	"fmt"
 	"image"
-	"image/png"
-	"log"
-	"math"
-	"os"
 )
 
 const (
@@ -15,72 +11,39 @@ const (
 	ImageWidth  = 400
 	ImageHeight = int(ImageWidth / AspectRatio)
 
-	// Camera
-	ViewportHeight = 2.0
-	ViewportWidth  = AspectRatio * ViewportHeight
-	FocalLength    = 1.0
-
-	PI = math.Pi
-)
-
-var (
-	Infinity = math.Inf(1)
+	SamplesPerPixel = 100
 )
 
 func main() {
-
-	var (
-		origin          = Vec3{0, 0, 0}
-		horizontal      = Vec3{ViewportWidth, 0, 0}
-		vertical        = Vec3{0, ViewportHeight, 0}
-		lowerLeftCorner = origin.Sub(horizontal.ScalarDiv(2)).Sub(vertical.ScalarDiv(2)).Sub(Vec3{0, 0, FocalLength})
-	)
+	img := image.NewRGBA(image.Rect(0, 0, ImageWidth, ImageHeight))
 
 	world := World{
 		Sphere{Vec3{0, 0, -1}, 0.5},
 		Sphere{Vec3{0, -100.5, -1}, 100},
 	}
 
-	img := image.NewRGBA(image.Rect(0, 0, ImageWidth, ImageHeight))
+	camera := NewCamera()
 
-	for j := 0; j < ImageHeight; j++ {
-		fmt.Printf("\rScanlines remaining: %d  ", ImageHeight-j)
-		for i := 0; i < ImageWidth; i++ {
+	for y := 0; y < ImageHeight; y++ {
+		fmt.Printf("\rScanlines remaining: %d  ", ImageHeight-y)
+		for x := 0; x < ImageWidth; x++ {
 
-			u := float64(i) / float64(ImageWidth-1)
-			v := float64(j) / float64(ImageHeight-1)
+			pixelColor := Vec3{0, 0, 0}
+			for s := 0; s < SamplesPerPixel; s++ {
+				u := (float64(x) + random()) / float64(ImageWidth-1.0)
+				v := (float64(y) + random()) / float64(ImageHeight-1.0)
+				ray := camera.GetRay(u, v)
+				pixelColor = pixelColor.Add(ray.Color(world))
 
-			direction := lowerLeftCorner.Add(horizontal.ScalarMul(u)).Add(vertical.ScalarMul(v)).Sub(origin)
-			ray := Ray{
-				origin:    origin,
-				direction: direction,
 			}
 
-			// j calculation is to invert the image.
-			img.Set(i, (ImageHeight-1)-j, ray.Color(world))
+			rgba := pixelColor.RGBA(SamplesPerPixel)
+
+			inverted_y := (ImageHeight - 1) - y
+			img.Set(x, inverted_y, rgba)
 		}
 	}
 
 	fmt.Printf("\nDone.\n")
 	writePNG(img, "output.png")
-}
-
-func DegreesToRadians(degrees float64) float64 {
-	return degrees * PI / 180.0
-}
-
-func writePNG(img *image.RGBA, filename string) {
-	f, err := os.Create(filename)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if err := png.Encode(f, img); err != nil {
-		f.Close()
-		log.Fatal(err)
-	}
-
-	if err := f.Close(); err != nil {
-		log.Fatal(err)
-	}
 }

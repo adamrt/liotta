@@ -85,11 +85,23 @@ func (v Vec3) Unit() Vec3 {
 	return v.ScalarDiv(v.Length())
 }
 
-func (v Vec3) RGBA() color.RGBA {
+func (v Vec3) RGBA(samplesPerPixel int) color.RGBA {
+
+	r := v.x
+	g := v.y
+	b := v.z
+
+	// Divide the color by the number of samples.
+	scale := 1.0 / float64(samplesPerPixel)
+	r *= scale
+	g *= scale
+	b *= scale
+
+	// Write the translated [0,255] value of each color component.
 	return color.RGBA{
-		uint8(255.999 * math.Max(0.0, math.Min(1.0, v.x))),
-		uint8(255.999 * math.Max(0.0, math.Min(1.0, v.y))),
-		uint8(255.999 * math.Max(0.0, math.Min(1.0, v.z))),
+		uint8(256 * clamp(r, 0.0, 0.999)),
+		uint8(256 * clamp(g, 0.0, 0.999)),
+		uint8(256 * clamp(b, 0.0, 0.999)),
 		255,
 	}
 }
