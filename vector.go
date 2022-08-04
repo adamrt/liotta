@@ -116,6 +116,17 @@ func (v Vec3) Unit() Vec3 {
 	return v.ScalarDiv(v.Length())
 }
 
+// NearZero returns true if the vector is close to zero in all dimensions.
+func (v Vec3) NearZero() bool {
+	const s = 1e-8
+	return (math.Abs(v.x) < s) && (math.Abs(v.y) < s) && (math.Abs(v.z) < s)
+}
+
+func (v Vec3) Reflect(u Vec3) Vec3 {
+	// v - 2*dot(v,u)*u;
+	return v.Sub(u.ScalarMul(2 * v.Dot(u)))
+}
+
 func (v Vec3) RGBA(samplesPerPixel int) color.RGBA {
 
 	r := v.x

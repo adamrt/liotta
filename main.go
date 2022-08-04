@@ -15,15 +15,22 @@ const (
 	MaxDepth        = 50
 
 	// There are 3 diffuse methods to, this is to switch between them.
-	DiffuseMethod = 3
+	LambertDiffuseMethod = 2
 )
 
 func main() {
 	img := image.NewRGBA(image.Rect(0, 0, ImageWidth, ImageHeight))
 
+	material_ground := Lambert{Vec3{0.8, 0.8, 0.0}}
+	material_center := Lambert{Vec3{0.7, 0.3, 0.3}}
+	material_left := Metal{Vec3{0.8, 0.8, 0.8}}
+	material_right := Metal{Vec3{0.8, 0.6, 0.2}}
+
 	world := World{
-		Sphere{Vec3{0, 0, -1}, 0.5},
-		Sphere{Vec3{0, -100.5, -1}, 100},
+		NewSphere(Vec3{0.0, -100.5, -1.0}, 100.0, material_ground),
+		NewSphere(Vec3{0.0, 0.0, -1.0}, 0.5, material_center),
+		NewSphere(Vec3{-1.0, 0.0, -1.0}, 0.5, material_left),
+		NewSphere(Vec3{1.0, 0.0, -1.0}, 0.5, material_right),
 	}
 
 	camera := NewCamera()

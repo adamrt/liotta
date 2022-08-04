@@ -2,9 +2,14 @@ package main
 
 import "math"
 
+func NewSphere(center Vec3, radius float64, material Material) Sphere {
+	return Sphere{center: center, radius: radius, material: material}
+}
+
 type Sphere struct {
-	center Vec3
-	radius float64
+	center   Vec3
+	radius   float64
+	material Material
 }
 
 func (s Sphere) Hit(ray Ray, tMin, tMax float64) (bool, HitRecord) {
@@ -30,8 +35,9 @@ func (s Sphere) Hit(ray Ray, tMin, tMax float64) (bool, HitRecord) {
 
 	point := ray.At(root)
 	record := HitRecord{
-		t:     root,
-		point: point,
+		t:        root,
+		point:    point,
+		material: s.material,
 	}
 	outwardNormal := point.Sub(s.center).ScalarDiv(s.radius)
 	record.SetFaceNormal(ray, outwardNormal)
