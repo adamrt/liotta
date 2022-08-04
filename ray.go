@@ -16,11 +16,19 @@ func (r Ray) At(t float64) Vec3 {
 	return r.origin.Add(v)
 }
 
-func (r Ray) Color(world Hittable) Vec3 {
-	hitRecord := HitRecord{}
-	if world.Hit(r, 0.0, Infinity, &hitRecord) {
-		return hitRecord.normal.Add(Vec3{1, 1, 1}).ScalarMul(0.5)
+func (r Ray) Color(world Hittable, depth int) Vec3 {
+	// If we've exceeded the ray bounce limit, no more light is gathered.
+	if depth <= 0 {
+		return Vec3{0, 0, 0}
 	}
+
+	hit, record := world.Hit(r, 0.0, Infinity)
+	if hit {
+		target := record.point.Add(record.normal).Add(Vec3RandomInUnitSphere())
+		ray := Ray{record.point, target.Sub(record.point)}
+		return ray.Color(world, depth-1).ScalarMul(0.5)
+	}
+
 	unitDirection := r.direction.Unit()
 	t := 0.5 * (unitDirection.y + 1.0)
 	a := Vec3{1.0, 1.0, 1.0}.ScalarMul(1.0 - t)

@@ -14,8 +14,12 @@ func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
 }
 
+func randomF(min, max float64) float64 {
+	return min + rand.Float64()*(max-min)
+}
+
 func random() float64 {
-	return 0.0 + rand.Float64()*(1.0-0.0)
+	return randomF(0.0, 1.0)
 }
 
 func clamp(x, min, max float64) float64 {

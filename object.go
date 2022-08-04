@@ -4,7 +4,7 @@ package main
 // can be a single item like a Sphere or a group of objects like the World
 // (array of Spheres).
 type Hittable interface {
-	Hit(ray Ray, min, max float64, record *HitRecord) bool
+	Hit(ray Ray, min, max float64) (bool, HitRecord)
 }
 
 // Hit Record stores information about a specific intersect of a ray hitting a
@@ -30,17 +30,18 @@ func (r *HitRecord) SetFaceNormal(ray Ray, outwardNormal Vec3) {
 
 type World []Hittable
 
-func (w World) Hit(ray Ray, tMin, tMax float64, record *HitRecord) bool {
+func (w World) Hit(ray Ray, tMin, tMax float64) (bool, HitRecord) {
 	tempRecord := HitRecord{}
 	hitAnything := false
 	closestSoFar := tMax
 
 	for _, object := range w {
-		if object.Hit(ray, tMin, closestSoFar, &tempRecord) {
+		hit, record := object.Hit(ray, tMin, closestSoFar)
+		if hit {
 			hitAnything = true
-			closestSoFar = tempRecord.t
-			*record = tempRecord
+			closestSoFar = record.t
+			tempRecord = record
 		}
 	}
-	return hitAnything
+	return hitAnything, tempRecord
 }

@@ -12,6 +12,7 @@ const (
 	ImageHeight = int(ImageWidth / AspectRatio)
 
 	SamplesPerPixel = 100
+	MaxDepth        = 50
 )
 
 func main() {
@@ -33,7 +34,7 @@ func main() {
 				u := (float64(x) + random()) / float64(ImageWidth-1.0)
 				v := (float64(y) + random()) / float64(ImageHeight-1.0)
 				ray := camera.GetRay(u, v)
-				pixelColor = pixelColor.Add(ray.Color(world))
+				pixelColor = pixelColor.Add(ray.Color(world, MaxDepth))
 
 			}
 
