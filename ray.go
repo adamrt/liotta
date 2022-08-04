@@ -24,7 +24,15 @@ func (r Ray) Color(world Hittable, depth int) Vec3 {
 
 	hit, record := world.Hit(r, 0.001, Infinity)
 	if hit {
-		target := record.point.Add(record.normal).Add(Vec3RandUnit())
+		var target Vec3
+		switch DiffuseMethod {
+		case 1:
+			target = record.point.Add(record.normal).Add(Vec3RandomInUnitSphere())
+		case 2:
+			target = record.point.Add(record.normal).Add(Vec3RandUnit())
+		case 3:
+			target = record.point.Add(Vec3RandomInHemisphere(record.normal))
+		}
 		ray := Ray{record.point, target.Sub(record.point)}
 		return ray.Color(world, depth-1).ScalarMul(0.5)
 	}

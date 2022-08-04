@@ -9,10 +9,7 @@ func Vec3Rand(min, max float64) Vec3 {
 	return Vec3{randomF(min, max), randomF(min, max), randomF(min, max)}
 }
 
-func Vec3RandUnit() Vec3 {
-	return Vec3RandomInUnitSphere().Unit()
-}
-
+// Diffuse method 1
 func Vec3RandomInUnitSphere() Vec3 {
 	for {
 		p := Vec3Rand(-1.0, 1.0)
@@ -20,6 +17,22 @@ func Vec3RandomInUnitSphere() Vec3 {
 			continue
 		}
 		return p
+	}
+}
+
+// Diffuse method 2
+func Vec3RandUnit() Vec3 {
+	return Vec3RandomInUnitSphere().Unit()
+}
+
+// Diffuse method 3
+func Vec3RandomInHemisphere(normal Vec3) Vec3 {
+	inUnitSphere := Vec3RandomInUnitSphere()
+	// In the same hemisphere as the normal
+	if inUnitSphere.Dot(normal) > 0.0 {
+		return inUnitSphere
+	} else {
+		return inUnitSphere.Neg()
 	}
 }
 

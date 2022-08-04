@@ -13,6 +13,9 @@ const (
 
 	SamplesPerPixel = 100
 	MaxDepth        = 50
+
+	// There are 3 diffuse methods to, this is to switch between them.
+	DiffuseMethod = 3
 )
 
 func main() {
