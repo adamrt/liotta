@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"image"
-	"image/color"
 	"image/png"
 	"log"
 	"os"
@@ -18,17 +17,15 @@ func main() {
 	for j := 0; j < Height; j++ {
 		fmt.Printf("\rScanlines remaining: %d  ", Height-j)
 		for i := 0; i < Width; i++ {
-			r := float64(i) / (Width - 1)
-			g := float64(j) / (Height - 1)
-			b := 0.25
+			pixel := Vec3{
+				x: float64(i) / (Width - 1),
+				y: float64(j) / (Height - 1),
+				z: 0.25,
+			}
 
 			// j calculation is to invert the image.
-			img.Set(i, (Height-1)-j, color.RGBA{
-				uint8(255.999 * r),
-				uint8(255.999 * g),
-				uint8(255.999 * b),
-				255,
-			})
+			img.Set(i, (Height-1)-j, pixel.RGBA())
+
 		}
 	}
 
