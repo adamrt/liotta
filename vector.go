@@ -2,7 +2,6 @@ package main
 
 import (
 	"image/color"
-	"log"
 	"math"
 )
 
@@ -10,14 +9,13 @@ func Vec3Rand(min, max float64) Vec3 {
 	return Vec3{randomF(min, max), randomF(min, max), randomF(min, max)}
 }
 
+func Vec3RandUnit() Vec3 {
+	return Vec3RandomInUnitSphere().Unit()
+}
+
 func Vec3RandomInUnitSphere() Vec3 {
-	i := 0
-	var p Vec3
 	for {
-		if i > 10 {
-			log.Fatal("too many")
-		}
-		p = Vec3Rand(-1.0, 1.0)
+		p := Vec3Rand(-1.0, 1.0)
 		if p.LengthSquared() >= 1 {
 			continue
 		}
