@@ -7,9 +7,9 @@ import (
 
 const (
 	// Image
-	AspectRatio = 16.0 / 9.0
+	aspectRatio = 16.0 / 9.0
 	ImageWidth  = 400
-	ImageHeight = int(ImageWidth / AspectRatio)
+	ImageHeight = int(ImageWidth / aspectRatio)
 
 	SamplesPerPixel = 100
 	MaxDepth        = 50
@@ -30,11 +30,15 @@ func main() {
 		NewSphere(Vec3{0.0, -100.5, -1.0}, 100.0, materialGround),
 		NewSphere(Vec3{0.0, 0.0, -1.0}, 0.5, materialCenter),
 		NewSphere(Vec3{-1.0, 0.0, -1.0}, 0.5, materialLeft),
-		NewSphere(Vec3{-1.0, 0.0, -1.0}, -0.4, materialLeft),
+		NewSphere(Vec3{-1.0, 0.0, -1.0}, -0.45, materialLeft),
 		NewSphere(Vec3{1.0, 0.0, -1.0}, 0.5, materialRight),
 	}
 
-	camera := NewCamera()
+	vfov := 90.0
+	camPos := Vec3{-2, 1.0, 0.5}
+	lookAt := Vec3{0, 0, -1}
+	up := Vec3{0, 1, 0}
+	camera := NewCamera(camPos, lookAt, up, vfov, aspectRatio)
 
 	for y := 0; y < ImageHeight; y++ {
 		fmt.Printf("\rScanlines remaining: %d  ", ImageHeight-y)

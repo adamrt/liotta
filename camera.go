@@ -1,14 +1,23 @@
 package main
 
-func NewCamera() Camera {
-	viewportHeight := 2.0
-	viewportWidth := AspectRatio * viewportHeight
-	focalLength := 1.0
+import "math"
 
-	origin := Vec3{0, 0, 0}
-	horizontal := Vec3{viewportWidth, 0, 0}
-	vertical := Vec3{0, viewportHeight, 0}
-	lowerLeftCorner := origin.Sub(horizontal.ScalarDiv(2)).Sub(vertical.ScalarDiv(2)).Sub(Vec3{0, 0, focalLength})
+func NewCamera(position Vec3, lookAt Vec3, up Vec3, vfov, aspectRatio float64) Camera {
+
+	theta := degreesToRadians(vfov)
+	h := math.Tan(theta / 2)
+	viewportHeight := 2.0 * h
+	viewportWidth := aspectRatio * viewportHeight
+
+	w := position.Sub(lookAt).Unit()
+	u := up.Cross(w).Unit()
+	v := w.Cross(u)
+
+	origin := position
+	horizontal := u.ScalarMul(viewportWidth)
+	vertical := v.ScalarMul(viewportHeight)
+	lowerLeftCorner := origin.Sub(horizontal.ScalarDiv(2)).Sub(vertical.ScalarDiv(2)).Sub(w)
+
 	return Camera{
 		origin:          origin,
 		horizontal:      horizontal,
