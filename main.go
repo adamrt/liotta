@@ -34,11 +34,14 @@ func main() {
 		NewSphere(Vec3{1.0, 0.0, -1.0}, 0.5, materialRight),
 	}
 
-	vfov := 90.0
-	camPos := Vec3{-2, 1.0, 0.5}
+	vfov := 20.0
+	camPos := Vec3{3, 3, 2}
 	lookAt := Vec3{0, 0, -1}
 	up := Vec3{0, 1, 0}
-	camera := NewCamera(camPos, lookAt, up, vfov, aspectRatio)
+	distToFocus := camPos.Sub(lookAt).Length()
+	aperture := 2.0
+
+	camera := NewCamera(camPos, lookAt, up, vfov, aspectRatio, aperture, distToFocus)
 
 	for y := 0; y < ImageHeight; y++ {
 		fmt.Printf("\rScanlines remaining: %d  ", ImageHeight-y)

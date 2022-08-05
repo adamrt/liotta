@@ -36,6 +36,16 @@ func Vec3RandomInHemisphere(normal Vec3) Vec3 {
 	}
 }
 
+func Vec3RandomInUnitDisk() Vec3 {
+	for {
+		p := Vec3{randomF(-1, 1), randomF(-1, 1), 0}
+		if p.LengthSquared() >= 1 {
+			continue
+		}
+		return p
+	}
+}
+
 type Vec3 struct {
 	x, y, z float64
 }
