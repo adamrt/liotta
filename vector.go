@@ -13,8 +13,8 @@ func Vec3Rand(min, max float64) Vec3 {
 func Vec3RandomInUnitSphere() Vec3 {
 	for {
 		p := Vec3Rand(-1.0, 1.0)
-		if p.LengthSquared() >= 1 {
-			continue
+		if p.Dot(p) < 1.0 {
+			return p
 		}
 		return p
 	}
@@ -39,8 +39,8 @@ func Vec3RandomInHemisphere(normal Vec3) Vec3 {
 func Vec3RandomInUnitDisk() Vec3 {
 	for {
 		p := Vec3{randomF(-1, 1), randomF(-1, 1), 0}
-		if p.LengthSquared() >= 1 {
-			continue
+		if p.Dot(p) < 1.0 {
+			return p
 		}
 		return p
 	}
@@ -115,11 +115,7 @@ func (v Vec3) Cross(u Vec3) Vec3 {
 }
 
 func (v Vec3) Length() float64 {
-	return math.Sqrt(v.LengthSquared())
-}
-
-func (v Vec3) LengthSquared() float64 {
-	return v.x*v.x + v.y*v.y + v.z*v.z
+	return math.Sqrt(v.x*v.x + v.y*v.y + v.z*v.z)
 }
 
 func (v Vec3) Unit() Vec3 {
@@ -140,7 +136,7 @@ func (v Vec3) Reflect(u Vec3) Vec3 {
 func (v Vec3) Refract(u Vec3, etaiOverEtat float64) Vec3 {
 	cosTheta := math.Min(v.Neg().Dot(u), 1.0)
 	rOutPerp := u.ScalarMul(cosTheta).Add(v).ScalarMul(etaiOverEtat)
-	rOutParallel := u.ScalarMul(-math.Sqrt(math.Abs(1.0 - rOutPerp.LengthSquared())))
+	rOutParallel := u.ScalarMul(-math.Sqrt(math.Abs(1.0 - rOutPerp.Dot(rOutPerp))))
 	return rOutPerp.Add(rOutParallel)
 }
 

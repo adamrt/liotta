@@ -3,18 +3,18 @@ package main
 import "math"
 
 type Material interface {
-	Scatter(ray Ray, record *HitRecord, attenuation *Vec3, scattered *Ray) bool
+	Scatter(ray *Ray, record *HitRecord) (*Vec3, *Ray, bool)
 }
 
-func NewLambert(albedo Vec3) Lambert {
-	return Lambert{albedo: albedo}
+func NewLambert(albedo Vec3) *Lambert {
+	return &Lambert{albedo: albedo}
 }
 
 type Lambert struct {
 	albedo Vec3
 }
 
-func (l Lambert) Scatter(ray Ray, record *HitRecord, attenuation *Vec3, scattered *Ray) bool {
+func (l Lambert) Scatter(ray *Ray, record *HitRecord) (*Vec3, *Ray, bool) {
 	var scatterDirection Vec3
 	switch LambertDiffuseMethod {
 	case 1:
@@ -30,13 +30,11 @@ func (l Lambert) Scatter(ray Ray, record *HitRecord, attenuation *Vec3, scattere
 		scatterDirection = record.normal
 	}
 
-	*scattered = Ray{record.point, scatterDirection}
-	*attenuation = l.albedo
-	return true
+	return &l.albedo, &Ray{record.point, scatterDirection}, true
 }
 
-func NewMetal(albedo Vec3, fuzz float64) Metal {
-	return Metal{albedo: albedo, fuzz: fuzz}
+func NewMetal(albedo Vec3, fuzz float64) *Metal {
+	return &Metal{albedo: albedo, fuzz: fuzz}
 }
 
 type Metal struct {
@@ -44,15 +42,14 @@ type Metal struct {
 	fuzz   float64
 }
 
-func (m Metal) Scatter(ray Ray, record *HitRecord, attenuation *Vec3, scattered *Ray) bool {
+func (m Metal) Scatter(ray *Ray, record *HitRecord) (*Vec3, *Ray, bool) {
 	reflected := ray.direction.Unit().Reflect(record.normal)
-	*scattered = Ray{record.point, Vec3RandomInUnitSphere().ScalarMul(m.fuzz).Add(reflected)}
-	*attenuation = m.albedo
-	return scattered.direction.Dot(record.normal) > 0
+	scattered := &Ray{record.point, Vec3RandomInUnitSphere().ScalarMul(m.fuzz).Add(reflected)}
+	return &m.albedo, scattered, scattered.direction.Dot(record.normal) > 0
 }
 
-func NewDielectric(index_of_refraction float64) Dielectric {
-	return Dielectric{ir: index_of_refraction}
+func NewDielectric(index_of_refraction float64) *Dielectric {
+	return &Dielectric{ir: index_of_refraction}
 }
 
 type Dielectric struct {
@@ -60,7 +57,7 @@ type Dielectric struct {
 	ir float64
 }
 
-func (d Dielectric) Scatter(ray Ray, record *HitRecord, attenuation *Vec3, scattered *Ray) bool {
+func (d Dielectric) Scatter(ray *Ray, record *HitRecord) (*Vec3, *Ray, bool) {
 
 	refractionRatio := d.ir
 	if record.frontFace {
@@ -81,11 +78,7 @@ func (d Dielectric) Scatter(ray Ray, record *HitRecord, attenuation *Vec3, scatt
 		direction = unitDirection.Refract(record.normal, refractionRatio)
 	}
 
-	*scattered = Ray{record.point, direction}
-
-	*attenuation = Vec3{1.0, 1.0, 1.0}
-	return true
-
+	return &Vec3{1.0, 1.0, 1.0}, &Ray{record.point, direction}, true
 }
 
 // Use Schlick's approximation for reflectance.

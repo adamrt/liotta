@@ -11,12 +11,12 @@ type Ray struct {
 	direction Vec3
 }
 
-func (r Ray) At(t float64) Vec3 {
+func (r *Ray) At(t float64) Vec3 {
 	v := r.direction.ScalarMul(t)
 	return r.origin.Add(v)
 }
 
-func (r Ray) Color(world Hittable, depth int) Vec3 {
+func (r *Ray) Color(world Hittable, depth int) Vec3 {
 	// If we've exceeded the ray bounce limit, no more light is gathered.
 	if depth <= 0 {
 		return Vec3{0, 0, 0}
@@ -24,10 +24,9 @@ func (r Ray) Color(world Hittable, depth int) Vec3 {
 
 	hit, record := world.Hit(r, 0.001, Infinity)
 	if hit {
-		scattered := Ray{}
-		attenuation := Vec3{}
-		if record.material.Scatter(r, &record, &attenuation, &scattered) {
-			return scattered.Color(world, depth-1).Mul(attenuation)
+		attenuation, scattered, ok := record.material.Scatter(r, record)
+		if ok {
+			return scattered.Color(world, depth-1).Mul(*attenuation)
 		}
 		return Vec3{0, 0, 0}
 	}
@@ -40,11 +39,11 @@ func (r Ray) Color(world Hittable, depth int) Vec3 {
 
 }
 
-func (r Ray) hitSphere(center Vec3, radius float64) float64 {
+func (r *Ray) hitSphere(center Vec3, radius float64) float64 {
 	oc := r.origin.Sub(center)
-	a := r.direction.LengthSquared()
+	a := r.direction.Dot(r.direction)
 	halfB := oc.Dot(r.direction)
-	c := oc.LengthSquared() - radius*radius
+	c := oc.Dot(oc) - radius*radius
 	discriminant := halfB*halfB - a*c
 	if discriminant < 0 {
 		return -1.0

@@ -12,15 +12,15 @@ type Sphere struct {
 	material Material
 }
 
-func (s Sphere) Hit(ray Ray, tMin, tMax float64) (bool, HitRecord) {
+func (s Sphere) Hit(ray *Ray, tMin, tMax float64) (bool, *HitRecord) {
 	oc := ray.origin.Sub(s.center)
-	a := ray.direction.LengthSquared()
+	a := ray.direction.Dot(ray.direction)
 	halfB := oc.Dot(ray.direction)
-	c := oc.LengthSquared() - s.radius*s.radius
+	c := oc.Dot(oc) - s.radius*s.radius
 
 	discriminant := halfB*halfB - a*c
 	if discriminant < 0 {
-		return false, HitRecord{}
+		return false, nil
 	}
 	sqrtd := math.Sqrt(discriminant)
 
@@ -29,7 +29,7 @@ func (s Sphere) Hit(ray Ray, tMin, tMax float64) (bool, HitRecord) {
 	if root < tMin || tMax < root {
 		root = (-halfB + sqrtd) / a
 		if root < tMin || tMax < root {
-			return false, HitRecord{}
+			return false, nil
 		}
 	}
 
@@ -42,5 +42,5 @@ func (s Sphere) Hit(ray Ray, tMin, tMax float64) (bool, HitRecord) {
 	outwardNormal := point.Sub(s.center).ScalarDiv(s.radius)
 	record.SetFaceNormal(ray, outwardNormal)
 
-	return true, record
+	return true, &record
 }

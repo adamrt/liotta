@@ -48,13 +48,13 @@ type Camera struct {
 	lensRadius      float64
 }
 
-func (c Camera) GetRay(s, t float64) Ray {
+func (c *Camera) GetRay(s, t float64) *Ray {
 	rd := Vec3RandomInUnitDisk().ScalarMul(c.lensRadius)
 	offset := c.u.ScalarMul(rd.x).Add(c.v.ScalarMul(rd.y))
 
 	direction := c.lowerLeftCorner.Add(c.horizontal.ScalarMul(s)).Add(c.vertical.ScalarMul(t)).Sub(c.origin).Sub(offset)
 
-	return Ray{
+	return &Ray{
 		origin:    c.origin.Add(offset),
 		direction: direction,
 	}
