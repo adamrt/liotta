@@ -20,26 +20,14 @@ const (
 
 func main() {
 	img := image.NewRGBA(image.Rect(0, 0, ImageWidth, ImageHeight))
-
-	materialGround := NewLambert(Vec3{0.8, 0.8, 0.0})
-	materialCenter := NewLambert(Vec3{0.1, 0.2, 0.5})
-	materialLeft := NewDielectric(1.5)
-	materialRight := NewMetal(Vec3{0.8, 0.6, 0.2}, 0.0)
-
-	world := World{
-		NewSphere(Vec3{0.0, -100.5, -1.0}, 100.0, materialGround),
-		NewSphere(Vec3{0.0, 0.0, -1.0}, 0.5, materialCenter),
-		NewSphere(Vec3{-1.0, 0.0, -1.0}, 0.5, materialLeft),
-		NewSphere(Vec3{-1.0, 0.0, -1.0}, -0.45, materialLeft),
-		NewSphere(Vec3{1.0, 0.0, -1.0}, 0.5, materialRight),
-	}
+	world := randomScene()
 
 	vfov := 20.0
-	camPos := Vec3{3, 3, 2}
-	lookAt := Vec3{0, 0, -1}
+	camPos := Vec3{13, 2, 3}
+	lookAt := Vec3{0, 0, 0}
 	up := Vec3{0, 1, 0}
-	distToFocus := camPos.Sub(lookAt).Length()
-	aperture := 2.0
+	distToFocus := 10.0 // camPos.Sub(lookAt).Length()
+	aperture := 0.1     // 2.0
 
 	camera := NewCamera(camPos, lookAt, up, vfov, aspectRatio, aperture, distToFocus)
 
@@ -65,4 +53,53 @@ func main() {
 
 	fmt.Printf("\nDone.\n")
 	writePNG(img, "output.png")
+}
+
+func randomScene() World {
+	world := World{}
+
+	// Ground sphere
+	materialGround := NewLambert(Vec3{0.5, 0.5, 0.5})
+	world = append(world, NewSphere(Vec3{0, -1000, 0}, 1000, materialGround))
+
+	// Random spheres
+	xx := 11
+	for a := -xx; a < xx; a++ {
+		for b := -xx; b < xx; b++ {
+			choose_mat := random()
+			center := Vec3{float64(a) + 0.9*random(), 0.2, float64(b) + 0.9*random()}
+
+			if center.Sub(Vec3{4, 0.2, 0}).Length() > 0.9 {
+				if choose_mat < 0.8 {
+					// diffuse
+					albedo := Vec3Rand(0, 1).Mul(Vec3Rand(0, 1))
+					material := NewLambert(albedo)
+					world = append(world, NewSphere(center, 0.2, material))
+				} else if choose_mat < 0.95 {
+					// metal
+					albedo := Vec3{randomF(0.5, 1), randomF(0.5, 1), randomF(0.5, 1)}
+					fuzz := randomF(0, 0.5)
+					material := NewMetal(albedo, fuzz)
+					world = append(world, NewSphere(center, 0.2, material))
+				} else {
+					// glass
+					material := NewDielectric(1.5)
+					world = append(world, NewSphere(center, 0.2, material))
+				}
+			}
+		}
+	}
+
+	// Three large constant spheres
+
+	material1 := NewDielectric(1.5)
+	world = append(world, NewSphere(Vec3{0, 1, 0}, 1.0, material1))
+
+	material2 := NewLambert(Vec3{0.4, 0.2, 0.1})
+	world = append(world, NewSphere(Vec3{-4, 1, 0}, 1.0, material2))
+
+	material3 := NewMetal(Vec3{0.7, 0.6, 0.5}, 0.0)
+	world = append(world, NewSphere(Vec3{4, 1, 0}, 1.0, material3))
+
+	return world
 }
