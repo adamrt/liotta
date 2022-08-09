@@ -3,17 +3,26 @@ package main
 import (
 	"fmt"
 	"image"
+	"image/color"
+
+	"github.com/cheggaaa/pb/v3"
 )
 
 const (
 	// Image
 	aspectRatio = 4.0 / 3.0
-	ImageWidth  = 1200
+	ImageWidth  = 800
 	ImageHeight = int(ImageWidth / aspectRatio)
 
-	SamplesPerPixel = 500
+	SamplesPerPixel = 100
 	MaxDepth        = 50
+	Threads         = 12
 )
+
+type Pixel struct {
+	x, y  int
+	color color.RGBA
+}
 
 func main() {
 	img := image.NewRGBA(image.Rect(0, 0, ImageWidth, ImageHeight))
@@ -28,28 +37,36 @@ func main() {
 
 	camera := NewCamera(camPos, lookAt, up, vfov, aspectRatio, aperture, distToFocus)
 
-	for y := 0; y < ImageHeight; y++ {
-		fmt.Printf("\rScanlines remaining: %d  ", ImageHeight-y)
-		for x := 0; x < ImageWidth; x++ {
+	bar := pb.StartNew(ImageHeight * ImageWidth)
+	pixelChan := make(chan Pixel)
 
-			pixelColor := Vec3{0, 0, 0}
-			for s := 0; s < SamplesPerPixel; s++ {
-				u := (float64(x) + random()) / float64(ImageWidth-1.0)
-				v := (float64(y) + random()) / float64(ImageHeight-1.0)
-				ray := camera.GetRay(u, v)
-				pixelColor = pixelColor.Add(ray.Color(world, MaxDepth))
-
+	// Start a new renderer for each thread
+	for i := 0; i < Threads; i++ {
+		go func() {
+			for pixel := range pixelChan {
+				var color Vec3
+				for s := 0; s < SamplesPerPixel; s++ {
+					u := (float64(pixel.x) + random()) / float64(ImageWidth)
+					v := (float64(pixel.y) + random()) / float64(ImageHeight)
+					ray := camera.GetRay(u, v)
+					color = color.Add(ray.Color(world, MaxDepth))
+				}
+				img.Set(pixel.x, ImageHeight-1-pixel.y, color.RGBA(SamplesPerPixel))
+				bar.Increment()
 			}
+		}()
+	}
 
-			rgba := pixelColor.RGBA(SamplesPerPixel)
-
-			inverted_y := (ImageHeight - 1) - y
-			img.Set(x, inverted_y, rgba)
+	// Populate the pixels channel with each pixel
+	for y := 0; y < ImageHeight; y++ {
+		for x := 0; x < ImageWidth; x++ {
+			pixelChan <- Pixel{x: x, y: y}
 		}
 	}
 
 	fmt.Printf("\nDone.\n")
 	writePNG(img, "output.png")
+	bar.Finish()
 }
 
 func randomScene() World {
