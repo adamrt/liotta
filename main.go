@@ -13,9 +13,6 @@ const (
 
 	SamplesPerPixel = 500
 	MaxDepth        = 50
-
-	// There are 3 diffuse methods to, this is to switch between them.
-	LambertDiffuseMethod = 2
 )
 
 func main() {

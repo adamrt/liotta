@@ -15,15 +15,7 @@ type Lambert struct {
 }
 
 func (l Lambert) Scatter(ray *Ray, record *HitRecord) (*Vec3, *Ray, bool) {
-	var scatterDirection Vec3
-	switch LambertDiffuseMethod {
-	case 1:
-		scatterDirection = record.normal.Add(Vec3RandomInUnitSphere())
-	case 2:
-		scatterDirection = record.normal.Add(Vec3RandUnit())
-	case 3:
-		scatterDirection = Vec3RandomInHemisphere(record.normal)
-	}
+	scatterDirection := record.normal.Add(Vec3RandUnit())
 
 	// Catch degenerate scatter direction
 	if scatterDirection.NearZero() {
