@@ -7,11 +7,11 @@ import (
 
 const (
 	// Image
-	aspectRatio = 16.0 / 9.0
-	ImageWidth  = 400
+	aspectRatio = 4.0 / 3.0
+	ImageWidth  = 1200
 	ImageHeight = int(ImageWidth / aspectRatio)
 
-	SamplesPerPixel = 100
+	SamplesPerPixel = 500
 	MaxDepth        = 50
 
 	// There are 3 diffuse methods to, this is to switch between them.
