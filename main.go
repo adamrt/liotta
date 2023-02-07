@@ -63,6 +63,7 @@ func main() {
 			pixelChan <- Pixel{x: x, y: y}
 		}
 	}
+	close(pixelChan)
 
 	fmt.Printf("\nDone.\n")
 	writePNG(img, "output.png")

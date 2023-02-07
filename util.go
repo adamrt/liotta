@@ -41,13 +41,10 @@ func writePNG(img *image.RGBA, filename string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer f.Close()
 
-	if err := png.Encode(f, img); err != nil {
-		f.Close()
-		log.Fatal(err)
-	}
-
-	if err := f.Close(); err != nil {
+	err = png.Encode(f, img)
+	if err != nil {
 		log.Fatal(err)
 	}
 }
